@@ -1,0 +1,72 @@
+@(todos: List[todo], message: String, todoForm: Form[todo])
+
+@main("todoy") {
+
+    <h1>@message</h1>
+        
+        <h2>Nouveau todo : </h2>
+        
+        @helper.form(action = routes.Application.submittodo()) {
+        
+        @helper.inputText(todoForm("commentaire"))
+        @helper.inputText(todoForm("username"))
+        
+        <input type="submit" class="btn primary" value="todo !!!">
+        
+        }
+        
+        <button class="btn btn-more" type ="button">More todos</button>
+        
+        <h2>Messages</h2>
+        
+        <table class="table table-striped">
+        
+                <tr>
+                        <td>nb todo</td>
+                        <td>ID</td>
+                        <td>Date</td>
+                        <td>Username</td>
+                        <td>todo</td>
+                </tr>
+                
+        @for((todo, i) <- todos.zipWithIndex.reverse) {
+                <tr>
+                        <td>@i</td>
+                        <td>@todo.id</td>
+                        <td>@todo.creationDate</td>
+                        <td>@todo.username</td>
+                        <td>@todo.commentaire</td>
+                </tr>
+        }
+        </table>
+        
+        Il y a au total @todos.size todos.
+
+}
+<script type="text/javascript">
+$(document).ready(function($){
+
+        $("body").ajaxError(function(event, jqXHR, ajaxSettings, thrownError){
+            alert("ERROR : " + thrownError);
+            location.reload();
+        });
+        
+     $btnMoretodos = $(".btn-more");
+
+         $btnMoretodos.click(function(event) {
+            $this = $(this);
+                alert("more button pressed");
+                 $.ajax({
+                type: 'POST',
+                url: "@routes.Application.listtodosFromTo()",
+                contentType: "application/json; charset=UTF-8",
+                data: JSON.stringify({"from":@todos.size(), "to":3}),
+                success: function(data){
+                        var obj = eval(data);
+                        alert(obj[0].id);
+                   }
+                   })
+               });
+        
+});
+</script>
